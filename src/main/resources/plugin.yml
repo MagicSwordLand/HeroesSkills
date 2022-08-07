@@ -1,0 +1,8 @@
+name: HeroesSkills
+version: '${version}'
+main: net.brian.heroesskills.HeroesSkills
+api-version: 1.18
+depend: [ PlayerDataSync,MMOItems,MythicLib,MythicMobs,PlaceholderAPI ]
+commands:
+  HeroesSkill:
+    aliases: [hs]
