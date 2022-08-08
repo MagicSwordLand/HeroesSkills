@@ -24,6 +24,11 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
     private HashMap<String,SkillData> skillDataMap = new HashMap<>();
 
 
+    private HashMap<String,Integer> skillPointSource = new HashMap<>();
+
+    @Getter
+    private int skillPoint = 0;
+
     @Getter
     private transient Player player;
 
@@ -38,6 +43,8 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
             if(v == null) v = new SkillData();
             int targetLevel = v.level + levels;
             v.level = Math.min(skill.getMaxLevel(),targetLevel);
+            skill.onDeactivate(this,v);
+            skill.onActivate(this,v);
             return v;
         });
     }
@@ -47,8 +54,9 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
     }
 
 
-    public Optional<SkillData> getSkillData(String skillID){
-        return Optional.ofNullable(skillDataMap.get(skillID));
+    private static final SkillData EMPTY_DATA = new SkillData();
+    public SkillData getSkillData(String skillID){
+        return skillDataMap.getOrDefault(skillID,EMPTY_DATA);
     }
 
     public Set<Map.Entry<String, SkillData>> getSkills() {
@@ -61,7 +69,7 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
         SkillManager skillManager = HeroesSkills.getInstance().getSkillManager();
         skillDataMap.forEach((id,data)->{
             skillManager.get(id).ifPresent(abstractSkill -> {
-                abstractSkill.onActivate(this);
+                abstractSkill.onActivate(this,data);
             });
         });
     }
@@ -71,7 +79,7 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
         SkillManager skillManager = HeroesSkills.getInstance().getSkillManager();
         skillDataMap.forEach((id,data)->{
             skillManager.get(id).ifPresent(abstractSkill -> {
-                abstractSkill.onDeactivate(this);
+                abstractSkill.onDeactivate(this,data);
             });
         });
     }
@@ -83,7 +91,7 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
     public void setButtonSkill(ClickSequence clickSequence,@Nullable ActiveSkill activeSkill){
         String originSkill = castingButtonSettings.get(clickSequence.getId());
         HeroesSkills.getInstance().getSkillManager().get(originSkill).ifPresent(skill->{
-            skill.onDeactivate(this);
+            skill.onDeactivate(this,skillDataMap.get(originSkill));
         });
         if(activeSkill == null){
             castingButtonSettings.put(clickSequence.getId(),"");
@@ -91,7 +99,56 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
         }
         if(!skillDataMap.containsKey(activeSkill.getSkillID())) return;
         castingButtonSettings.put(clickSequence.getId(),activeSkill.getSkillID());
-        activeSkill.onActivate(this);
+        activeSkill.onActivate(this,skillDataMap.get(activeSkill.getSkillID()));
+    }
+
+    public void giveSkillPoint(int amount,String source){
+        skillPointSource.compute(source,(k,v)->{
+            if(v == null) v = 0;
+            v+=amount;
+            skillPoint += amount;
+            return v;
+        });
+    }
+
+    public void setSkillPoint(String source,int amount){
+        skillPointSource.put(source,amount);
+        resetSkillPoints();
+    }
+
+    public void resetSkillPoints(){
+        skillDataMap.values().forEach(data->data.level = 0);
+        skillPoint = 0;
+        for (Map.Entry<String, Integer> entry : skillPointSource.entrySet()) {
+            if(!entry.getKey().equals("tempt")){
+                skillPoint += entry.getValue();
+            }
+        }
+    }
+
+    public void assignSkillPoint(int amount,AbstractSkill abstractSkill){
+        skillDataMap.compute(abstractSkill.getSkillID(),(k,v)->{
+            if(v == null) {
+                v = new SkillData();
+            }
+            int increaseLevel = Math.min(abstractSkill.getMaxLevel()-v.level,amount);
+            if(skillPoint >= increaseLevel){
+                if(v.level > 0) abstractSkill.onDeactivate(this,v);
+                v.level += increaseLevel;
+                skillPoint -= increaseLevel;
+                abstractSkill.onActivate(this,v);
+            }
+            else player.sendMessage("操作失敗，技能點不足，剩餘"+skillPoint);
+            return v;
+        });
+    }
+
+    public int getMaxSkillPoint(){
+        int points = skillPoint;
+        for (Integer i : skillPointSource.values()) {
+            points+=i;
+        }
+        return points;
     }
 }
 

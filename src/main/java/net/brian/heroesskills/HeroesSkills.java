@@ -12,6 +12,7 @@ import net.brian.heroesskills.bukkit.listeners.CastingListener;
 import net.brian.heroesskills.core.compabilities.mmo.MMOManaProvider;
 import net.brian.heroesskills.core.compabilities.placeholder.PlaceholderManager;
 import net.brian.heroesskills.core.gui.SkillSelectGui;
+import net.brian.heroesskills.core.gui.paths.MainPathGui;
 import net.brian.heroesskills.core.skills.SkillManagerImpl;
 import net.brian.playerdatasync.PlayerDataSync;
 import org.bukkit.Bukkit;
@@ -34,6 +35,9 @@ public final class HeroesSkills extends JavaPlugin {
     @Getter
     private SkillSelectGui skillSelectGui;
 
+    @Getter
+    private MainPathGui mainPathGui;
+
 
     @Override
     public void onLoad(){
@@ -51,6 +55,7 @@ public final class HeroesSkills extends JavaPlugin {
         skillSelectGui = new SkillSelectGui(instance,skillManager);
         getCommand("HeroesSkill").setExecutor(new CommandManager(this));
         registerListeners();
+        mainPathGui = new MainPathGui(this);
         new PlaceholderManager(this);
     }
 

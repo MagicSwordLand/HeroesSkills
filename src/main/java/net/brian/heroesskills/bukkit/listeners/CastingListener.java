@@ -2,8 +2,6 @@ package net.brian.heroesskills.bukkit.listeners;
 
 import net.brian.heroesskills.HeroesSkills;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
-import net.brian.heroesskills.api.players.SkillData;
-import net.brian.heroesskills.api.skills.ActiveSkill;
 import net.brian.heroesskills.api.skills.casting.ClickSequence;
 import net.brian.heroesskills.api.skills.casting.ClickType;
 import org.bukkit.Bukkit;
@@ -17,7 +15,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.swing.*;
 import java.util.*;
 
 public class CastingListener implements Listener {
@@ -87,7 +84,7 @@ public class CastingListener implements Listener {
             for (ClickType type : sequence) {
                 display += type.getDisplay();
             }
-            player.sendTitle(display,display);
+            player.sendTitle("   ",display);
         }
 
         BukkitTask startRefreshTask(){

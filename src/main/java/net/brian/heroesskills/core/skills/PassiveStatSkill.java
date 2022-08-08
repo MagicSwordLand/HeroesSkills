@@ -11,21 +11,24 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 
 public class PassiveStatSkill extends AbstractSkill {
 
-    private final BiFunction<HumanEntity,SkillData,Icon> icon;
-    private final BiFunction<Player,SkillData,Double> amountFunction;
+    private final BiFunction<PlayerSkillProfile,SkillData,Icon> icon;
+    private final BiFunction<PlayerSkillProfile,SkillData,Double> amountFunction;
     private final String stat;
+
 
     public PassiveStatSkill(
             String skillID,
             String display,
             int maxLevel,
             String stat,
-            BiFunction<Player,SkillData,Double>  amountFunction,
-            BiFunction<HumanEntity,SkillData,Icon> icon) {
+            BiFunction<PlayerSkillProfile,SkillData,Double>  amountFunction,
+            BiFunction<PlayerSkillProfile,SkillData,Icon> icon) {
         super(skillID,display);
         this.stat = stat;
         this.maxLevel = maxLevel;
@@ -34,17 +37,17 @@ public class PassiveStatSkill extends AbstractSkill {
     }
 
     @Override
-    protected Icon getIcon(HumanEntity player, SkillData skillData) {
+    protected Icon getIcon(PlayerSkillProfile player, SkillData skillData) {
         return icon.apply(player,skillData);
     }
 
-    @Override
-    public void onActivate(@NotNull PlayerSkillProfile playerProfile){
+    public void onActivate(@NotNull PlayerSkillProfile playerProfile,SkillData skillData){
         StatInstance statInstance = PlayerData.get(playerProfile.getUuid()).getStats().getMap().getInstance(stat);
         StatModifier statModifier = new StatModifier(
                 "HeroesSkill-"+skillID,stat,
-                amountFunction.apply(playerProfile.getPlayer(),playerProfile.getSkillData(skillID).get()));
+                amountFunction.apply(playerProfile,skillData));
         statInstance.addModifier(statModifier);
     }
+
 
 }

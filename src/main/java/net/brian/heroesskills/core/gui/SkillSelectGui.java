@@ -59,9 +59,12 @@ public class SkillSelectGui extends PageGui {
 
             Optional<ActiveSkill> skill= skillManager.getActiveSkill(entry.getKey());
             if(skill.isPresent()) {
-                inv.setItem(skillIndex, skill.get().getDisplay(humanEntity, entry.getValue()));
+                inv.setItem(skillIndex, skill.get().getDisplay(skillProfile, entry.getValue()));
                 skillIndex++;
             }
+        }
+        if(inv == null){
+            humanEntity.sendMessage("你當前沒有任何主動技能");
         }
 
         return pages;
@@ -77,12 +80,10 @@ public class SkillSelectGui extends PageGui {
         }
         String pickedSkillID = Icon.read(event.getCurrentItem(),"SkillID");
         if(pickedSkillID == null) {
-            event.getWhoClicked().sendMessage("null id");
             return;
         }
         Optional<ActiveSkill> pickedSkill = skillManager.getActiveSkill(pickedSkillID);
         if(pickedSkill.isEmpty()) {
-            event.getWhoClicked().sendMessage("cant find "+pickedSkillID);
             return;
         }
         PlayerSkillProfile.get(event.getWhoClicked().getUniqueId()).ifPresent(profile->{
@@ -90,7 +91,6 @@ public class SkillSelectGui extends PageGui {
             profile.setButtonSkill(selectCache.clickSequence, pickedSkill.get());
             refresh(event.getWhoClicked());
             firstPage(event.getWhoClicked());
-            event.getWhoClicked().sendMessage("first page");
         });
     }
 
@@ -118,9 +118,9 @@ public class SkillSelectGui extends PageGui {
         element.setDisplay(skillProfile -> {
             Optional<ActiveSkill> abstractSkill = skillProfile.getButtonSkill(clickSequence);
             if(abstractSkill.isEmpty()) return itemStack;
-            Optional<SkillData> skillData = skillProfile.getSkillData(abstractSkill.get().getSkillID());
+            SkillData skillData = skillProfile.getSkillData(abstractSkill.get().getSkillID());
             if(skillData.isEmpty()) return itemStack;
-            return abstractSkill.get().getDisplay(skillProfile.getPlayer(),skillData.get());
+            return abstractSkill.get().getDisplay(skillProfile,skillData);
         });
         element.setAction(event -> {
             if(event.isLeftClick()){

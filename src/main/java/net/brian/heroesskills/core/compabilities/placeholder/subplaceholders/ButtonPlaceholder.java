@@ -15,9 +15,9 @@ public class ButtonPlaceholder extends SubPlaceholder {
     public String onRequest(PlayerSkillProfile skillProfile, String[] args) {
         if(args.length==0) return "";
         try {
-            ClickSequence clickSequence = ClickSequence.valueOf(args[0]);
+            ClickSequence clickSequence = ClickSequence.valueOf(args[0].toUpperCase());
             return skillProfile.getButtonSkill(clickSequence).map(AbstractSkill::getDisplayName)
-                    .orElse("");
+                    .orElse("&c尚未綁定");
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }

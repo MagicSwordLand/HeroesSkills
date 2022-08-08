@@ -13,7 +13,7 @@ import java.util.function.BiFunction;
 
 public class MythicActiveSkill extends ActiveSkill {
 
-    private final BiFunction<HumanEntity,SkillData,Icon> icon;
+    private final BiFunction<PlayerSkillProfile,SkillData,Icon> icon;
 
 
     public MythicActiveSkill(String mythicSkill,
@@ -21,7 +21,7 @@ public class MythicActiveSkill extends ActiveSkill {
                              int maxLevel,
                              double manaConsume,
                              double cooldown,
-                             BiFunction<HumanEntity,SkillData,Icon> icon) {
+                             BiFunction<PlayerSkillProfile,SkillData,Icon> icon) {
         super(mythicSkill,display);
         this.icon = icon;
         this.manaConsume = manaConsume;
@@ -36,7 +36,8 @@ public class MythicActiveSkill extends ActiveSkill {
     }
 
     @Override
-    protected Icon getIcon(HumanEntity player, SkillData skillData) {
-        return icon.apply(player,skillData);
+    protected Icon getIcon(PlayerSkillProfile skillProfile, SkillData skillData) {
+        return icon.apply(skillProfile,skillData);
     }
+
 }

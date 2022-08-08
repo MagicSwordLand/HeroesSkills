@@ -24,24 +24,26 @@ public abstract class AbstractSkill {
     @Getter
     protected String displayName = "";
 
+    public static final String ICON_KEY = "SkillID";
+
     public AbstractSkill(String skillID,String displayName){
         this.skillID = skillID;
         this.displayName = IridiumColorAPI.process(displayName);
     }
 
-    protected abstract Icon getIcon(HumanEntity player, SkillData skillData);
+    protected abstract Icon getIcon(PlayerSkillProfile player, SkillData skillData);
 
-    public ItemStack getDisplay(HumanEntity player,SkillData skillData){
-        Icon icon = getIcon(player,skillData);
-        icon.addTags("SkillID",skillID);
-        return icon.build();
+    public ItemStack getDisplay(PlayerSkillProfile profile,SkillData skillData){
+        Icon icon = getIcon(profile,skillData);
+        icon.addTags(ICON_KEY,skillID);
+        return icon.build(profile.getPlayer());
     }
 
     // runs on player join , on levelup (right after onDeactivate) , and on active skill equip
-    public void onActivate(@NotNull PlayerSkillProfile playerProfile){}
+    public void onActivate(@NotNull PlayerSkillProfile playerProfile,SkillData skillData){}
 
     //runs on player leave, on levelup (runs onActivate afterwards) , and on active skill unequip
-    public void onDeactivate( @NotNull PlayerSkillProfile playerProfile){}
+    public void onDeactivate( @NotNull PlayerSkillProfile playerProfile, SkillData skillData){}
 
 
 }

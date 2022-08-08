@@ -1,9 +1,11 @@
 package net.brian.heroesskills.core.utils;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.brian.heroesskills.HeroesSkills;
 import net.brian.playerdatasync.util.IridiumColorAPI;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -41,6 +43,12 @@ public class Icon {
         }
         itemStack.setItemMeta(meta);
         return itemStack;
+    }
+
+    public ItemStack build(Player player){
+        lore = PlaceholderAPI.setPlaceholders(player,lore);
+        display = PlaceholderAPI.setPlaceholders(player,display);
+        return build();
     }
 
     public Icon addTags(String key,String value){

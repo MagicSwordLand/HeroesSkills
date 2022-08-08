@@ -13,7 +13,7 @@ public class SkillLevelPlaceholder extends SubPlaceholder {
     @Override
     public String onRequest(PlayerSkillProfile skillProfile, String[] args) {
         if(args.length == 0) return "0";
-        return skillProfile.getSkillData(args[0]).map(skillData -> String.valueOf(skillData.level)).orElse("0");
+        return String.valueOf(skillProfile.getSkillData(args[0]).level);
     }
 
 }

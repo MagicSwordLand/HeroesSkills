@@ -3,9 +3,7 @@ package net.brian.heroesskills.core.compabilities.placeholder;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.brian.heroesskills.HeroesSkills;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
-import net.brian.heroesskills.core.compabilities.placeholder.subplaceholders.ButtonPlaceholder;
-import net.brian.heroesskills.core.compabilities.placeholder.subplaceholders.ManaPlaceholder;
-import net.brian.heroesskills.core.compabilities.placeholder.subplaceholders.SkillLevelPlaceholder;
+import net.brian.heroesskills.core.compabilities.placeholder.subplaceholders.*;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +20,8 @@ public class PlaceholderManager extends PlaceholderExpansion {
         subPlaceholders.add(new ManaPlaceholder(plugin));
         subPlaceholders.add(new ButtonPlaceholder(plugin));
         subPlaceholders.add(new SkillLevelPlaceholder(plugin));
+        subPlaceholders.add(new SkillPointsPlaceholder(plugin));
+        subPlaceholders.add(new PathPlaceholder(plugin));
         this.register();
     }
 

@@ -36,9 +36,8 @@ public abstract class ActiveSkill extends AbstractSkill {
 
     public void cast(Player player, @NotNull PlayerSkillProfile playerProfile){
         ManaEntity manaEntity = HeroesSkills.getInstance().getManaProvider().getManaEntity(player.getUniqueId());
-        Optional<SkillData> skillData = playerProfile.getSkillData(skillID);
-        if(skillData.isEmpty()) return ;
-        long a = ((long) cooldown)*1000 - (System.currentTimeMillis() - skillData.get().lastCast);
+        SkillData skillData = playerProfile.getSkillData(skillID);
+        long a = ((long) cooldown)*1000 - (System.currentTimeMillis() - skillData.lastCast);
         if(a > 0) {
             player.sendMessage(displayName+"技能冷卻中"+ TimeUnit.getDisplayTime(a));
         }
@@ -47,7 +46,7 @@ public abstract class ActiveSkill extends AbstractSkill {
         }
         else {
             onCast(player, playerProfile);
-            skillData.get().lastCast = System.currentTimeMillis();
+            skillData.lastCast = System.currentTimeMillis();
             player.sendMessage("成功施放 "+ displayName);
         }
     }
