@@ -1,0 +1,5 @@
+BUTTON_GUI_TITLE: "按鍵綁定gUI"
+MAIN_PATH_GUI_TITLE: "技能路徑選單"
+CAST_SUCCESS: "成功施放 #name#"
+CAST_NO_MANA: "魔力不足，需求:#require#"
+CAST_IN_COOLDOWN: "技能冷卻中: #cooldown#"

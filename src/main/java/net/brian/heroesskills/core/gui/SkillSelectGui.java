@@ -8,6 +8,7 @@ import net.brian.heroesskills.api.players.SkillData;
 import net.brian.heroesskills.api.skills.ActiveSkill;
 import net.brian.heroesskills.api.skills.SkillManager;
 import net.brian.heroesskills.api.skills.casting.ClickSequence;
+import net.brian.heroesskills.bukkit.configs.Language;
 import net.brian.heroesskills.core.utils.Icon;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -41,7 +42,7 @@ public class SkillSelectGui extends PageGui {
             return pages;
         }
         PlayerSkillProfile skillProfile = optSkillProfile.get();
-        Inventory firstPage = Bukkit.createInventory(null,27);
+        Inventory firstPage = Bukkit.createInventory(null,27, Language.BUTTON_GUI_TITLE);
         pages.add(firstPage);
         elements.forEach((slot,element)->firstPage.setItem(slot,element.getDisplay(skillProfile)));
 

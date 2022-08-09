@@ -6,6 +6,7 @@ import net.brian.heroesskills.HeroesSkills;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
 import net.brian.heroesskills.api.players.SkillData;
 import net.brian.heroesskills.api.players.mana.ManaEntity;
+import net.brian.heroesskills.bukkit.configs.Language;
 import net.brian.playerdatasync.util.IridiumColorAPI;
 import net.brian.playerdatasync.util.time.TimeUnit;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ public abstract class ActiveSkill extends AbstractSkill {
 
     //秒數
     @Setter
+    @Getter
     protected double cooldown = 10;
 
 
@@ -39,15 +41,15 @@ public abstract class ActiveSkill extends AbstractSkill {
         SkillData skillData = playerProfile.getSkillData(skillID);
         long a = ((long) cooldown)*1000 - (System.currentTimeMillis() - skillData.lastCast);
         if(a > 0) {
-            player.sendMessage(displayName+"技能冷卻中"+ TimeUnit.getDisplayTime(a));
+            player.sendMessage(Language.CAST_IN_COOLDOWN.replace("#cooldown#",TimeUnit.getDisplayTime(a)));
         }
         else if(!manaEntity.consume(manaConsume)){
-            player.sendMessage("施放此技能需要 "+manaConsume+" 點魔力，你只有"+manaEntity.getMana());
+            player.sendMessage(Language.CAST_NO_MANA.replace("#require#",manaConsume+""));
         }
         else {
             onCast(player, playerProfile);
             skillData.lastCast = System.currentTimeMillis();
-            player.sendMessage("成功施放 "+ displayName);
+            player.sendMessage(Language.CAST_SUCCESS.replace("#name#",displayName));
         }
     }
 }

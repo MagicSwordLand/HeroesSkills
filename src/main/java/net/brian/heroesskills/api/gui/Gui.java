@@ -9,7 +9,4 @@ public interface Gui extends Listener {
 
     void open(HumanEntity humanEntity);
 
-
-
-
 }

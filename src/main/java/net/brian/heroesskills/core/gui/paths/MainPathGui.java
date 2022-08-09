@@ -3,6 +3,7 @@ package net.brian.heroesskills.core.gui.paths;
 import net.brian.heroesskills.HeroesSkills;
 import net.brian.heroesskills.api.gui.SimpleGui;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
+import net.brian.heroesskills.bukkit.configs.Language;
 import net.brian.heroesskills.core.utils.Icon;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -12,6 +13,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -27,7 +29,7 @@ public class MainPathGui extends SimpleGui {
 
     @Override
     public Inventory getView(HumanEntity humanEntity) {
-        Inventory inv = Bukkit.createInventory(null,54);
+        Inventory inv = Bukkit.createInventory(null,54, Language.MAIN_PATH_GUI_TITLE);
         Optional<PlayerSkillProfile> skillProfile = PlayerSkillProfile.get(humanEntity.getUniqueId());
         if(skillProfile.isEmpty()) return inv;
         paths.values().forEach(subPath -> {
@@ -49,8 +51,10 @@ public class MainPathGui extends SimpleGui {
     }
 
 
-    public void registerPath(String ID,int slot, Function<PlayerSkillProfile,Icon> display){
-        paths.put(ID,new SubPath(plugin,this,slot,display));
+    public void registerPath(String ID, int slot,String guiTitle, Function<PlayerSkillProfile,Icon> display,Map<Integer,Function<PlayerSkillProfile, Icon>> staticElements){
+        SubPath subPath = new SubPath(plugin,this,slot,guiTitle,display);
+        paths.put(ID,subPath);
+        staticElements.forEach(subPath::addStaticElement);
     }
 
     public void registerElement(PathElement pathElement){

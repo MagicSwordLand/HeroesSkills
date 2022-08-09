@@ -22,6 +22,7 @@ public class PlaceholderManager extends PlaceholderExpansion {
         subPlaceholders.add(new SkillLevelPlaceholder(plugin));
         subPlaceholders.add(new SkillPointsPlaceholder(plugin));
         subPlaceholders.add(new PathPlaceholder(plugin));
+        subPlaceholders.add(new CooldownPlaceholder(plugin));
         this.register();
     }
 

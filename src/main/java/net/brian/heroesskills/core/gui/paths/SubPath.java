@@ -1,6 +1,8 @@
 package net.brian.heroesskills.core.gui.paths;
 
 import lombok.Getter;
+import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.brian.heroesskills.HeroesSkills;
 import net.brian.heroesskills.api.gui.SimpleGui;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
@@ -10,6 +12,7 @@ import net.brian.heroesskills.core.utils.Icon;
 import net.brian.playerdatasync.gui.GuiPageElement;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -34,17 +37,20 @@ public class SubPath extends SimpleGui {
     @Getter
     int slot;
 
-    public SubPath(HeroesSkills plugin, MainPathGui mainPathGui, int slot, Function<PlayerSkillProfile,Icon> icon) {
+    private String guiTitle;
+
+    public SubPath(HeroesSkills plugin, MainPathGui mainPathGui, int slot,String guiTitle, Function<PlayerSkillProfile,Icon> icon) {
         super(plugin);
         this.mainPathGui = mainPathGui;
         onClose = mainPathGui::open;
         this.icon = icon;
+        this.guiTitle = guiTitle;
         this.slot = slot;
     }
 
     @Override
     public Inventory getView(HumanEntity humanEntity) {
-        Inventory inv = Bukkit.createInventory(null,54);
+        Inventory inv = Bukkit.createInventory(null,54, PlaceholderAPI.setPlaceholders((OfflinePlayer) humanEntity,guiTitle));
         Optional<PlayerSkillProfile> profile = PlayerSkillProfile.get(humanEntity.getUniqueId());
         if(profile.isEmpty()) return inv;
         PlayerSkillProfile skillProfile = profile.get();
@@ -75,7 +81,6 @@ public class SubPath extends SimpleGui {
                 profile.assignSkillPoint(1,pathElement.getAbstractSkill());
                 refresh(profile,event.getSlot());
             }
-            else event.getWhoClicked().sendMessage("你尚未達到該天賦的需求");
         });
     }
 

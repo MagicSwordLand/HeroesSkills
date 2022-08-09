@@ -8,6 +8,7 @@ import net.brian.heroesskills.api.players.PlayerSkillProfile;
 import net.brian.heroesskills.api.players.mana.ManaProvider;
 import net.brian.heroesskills.api.skills.SkillManager;
 import net.brian.heroesskills.bukkit.commands.CommandManager;
+import net.brian.heroesskills.bukkit.configs.Language;
 import net.brian.heroesskills.bukkit.listeners.CastingListener;
 import net.brian.heroesskills.core.compabilities.mmo.MMOManaProvider;
 import net.brian.heroesskills.core.compabilities.placeholder.PlaceholderManager;
@@ -49,6 +50,7 @@ public final class HeroesSkills extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         instance = this;
+        new Language(this);
         PlayerDataSync.getInstance().register("heroesskills", PlayerSkillProfile.class);
         manaProvider = new MMOManaProvider(this);
         skillManager = new SkillManagerImpl(this);
@@ -57,6 +59,7 @@ public final class HeroesSkills extends JavaPlugin {
         registerListeners();
         mainPathGui = new MainPathGui(this);
         new PlaceholderManager(this);
+
     }
 
     @Override
