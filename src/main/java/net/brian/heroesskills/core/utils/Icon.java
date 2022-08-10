@@ -81,6 +81,11 @@ public class Icon {
         return this;
     }
 
+    public Icon addLore(List<String> lore){
+        this.lore.addAll(lore);
+        return this;
+    }
+
     public static ItemStack create(Material mat,String... texts){
         ItemStack itemStack = new ItemStack(mat);
         ItemMeta meta = itemStack.getItemMeta();

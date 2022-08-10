@@ -59,7 +59,14 @@ public class SkillSelectGui extends PageGui {
             }
 
             Optional<ActiveSkill> skill= skillManager.getActiveSkill(entry.getKey());
-            if(skill.isPresent()) {
+            if(skill.isEmpty()){
+               // humanEntity.sendMessage("Can't find "+entry.getKey() +" active skill");
+            }
+            if(entry.getValue().isEmpty()){
+               // humanEntity.sendMessage("你的"+entry.getKey()+"等級是0");
+            }
+            if(skill.isPresent() && !entry.getValue().isEmpty()) {
+                //humanEntity.sendMessage("成功放置icon");
                 inv.setItem(skillIndex, skill.get().getDisplay(skillProfile, entry.getValue()));
                 skillIndex++;
             }
@@ -76,6 +83,7 @@ public class SkillSelectGui extends PageGui {
         if(event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) return;
         if(cache.currentPage == 0){
             GuiElement element = elements.get(event.getSlot());
+            if(element == null || element.getAction() == null) return;
             element.getAction().accept(event);
             return;
         }

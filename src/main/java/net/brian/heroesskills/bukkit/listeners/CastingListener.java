@@ -1,5 +1,6 @@
 package net.brian.heroesskills.bukkit.listeners;
 
+import io.lumine.mythic.lib.api.item.NBTItem;
 import net.brian.heroesskills.HeroesSkills;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
 import net.brian.heroesskills.api.skills.casting.ClickSequence;
@@ -13,14 +14,21 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class CastingListener implements Listener {
 
     public static long REFRESH_TICKS = 60;
 
+    private List<String> availableTypes = List.of(
+            "MAGICWIND",
+            "SPWEAPON",
+            "SWORD"
+    );
 
     private final HeroesSkills plugin;
     private Map<UUID,CastingProfile> castingMap = new HashMap<>();
@@ -29,10 +37,13 @@ public class CastingListener implements Listener {
         this.plugin = plugin;
     }
 
+
     @EventHandler
     public void onClick(PlayerInteractEvent event){
         if(event.getHand() == null) return;
         if(!event.getHand().equals(EquipmentSlot.HAND)) return;
+        if(!validCastingItem(event.getPlayer().getEquipment().getItemInMainHand())) return;
+
         CastingProfile castingProfile = castingMap.computeIfAbsent(event.getPlayer().getUniqueId(),k->new CastingProfile(event.getPlayer()));
         if( event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             castingProfile.updateClick(ClickType.RIGHT);
@@ -90,6 +101,16 @@ public class CastingListener implements Listener {
         BukkitTask startRefreshTask(){
             return Bukkit.getScheduler().runTaskLater(HeroesSkills.getInstance(), sequence::clear,REFRESH_TICKS);
         }
+    }
+
+    private boolean validCastingItem(@Nullable ItemStack itemStack){
+        if(itemStack == null) return false;
+        String type = NBTItem.get(itemStack).getType();
+        if(type  == null) return false;
+        if(availableTypes.contains(type)){
+            return true;
+        }
+        return false;
     }
 
 }

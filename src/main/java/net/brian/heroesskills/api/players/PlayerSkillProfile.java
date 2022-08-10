@@ -38,16 +38,7 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
 
 
 
-    public void addSkill(AbstractSkill skill, int levels){
-        skillDataMap.compute(skill.getSkillID(),(k,v)->{
-            if(v == null) v = new SkillData();
-            int targetLevel = v.level + levels;
-            v.level = Math.min(skill.getMaxLevel(),targetLevel);
-            skill.onDeactivate(this,v);
-            skill.onActivate(this,v);
-            return v;
-        });
-    }
+
 
     public static Optional<PlayerSkillProfile> get(UUID uuid){
         return PlayerDataSync.getInstance().getData(uuid,PlayerSkillProfile.class);
@@ -126,6 +117,17 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
         }
     }
 
+    public void addSkill(AbstractSkill skill, int levels){
+        skillDataMap.compute(skill.getSkillID(),(k,v)->{
+            if(v == null) v = new SkillData();
+            int targetLevel = v.level + levels;
+            v.level = Math.min(skill.getMaxLevel(),targetLevel);
+            skill.onDeactivate(this,v);
+            skill.onActivate(this,v);
+            return v;
+        });
+    }
+
     public void assignSkillPoint(int amount,AbstractSkill abstractSkill){
         skillDataMap.compute(abstractSkill.getSkillID(),(k,v)->{
             if(v == null) {
@@ -144,11 +146,17 @@ public class PlayerSkillProfile extends PlayerData implements PostProcessable, Q
     }
 
     public int getMaxSkillPoint(){
-        int points = skillPoint;
+        int points = 0;
         for (Integer i : skillPointSource.values()) {
             points+=i;
         }
         return points;
     }
+
+    public void reduceCoolDown(String skill,double seconds){
+        SkillData skillData = skillDataMap.get(skill);
+        if(skillData != null) skillData.lastCast -= seconds*1000L;
+    }
+
 }
 

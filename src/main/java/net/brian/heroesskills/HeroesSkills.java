@@ -42,6 +42,7 @@ public final class HeroesSkills extends JavaPlugin {
 
     @Override
     public void onLoad(){
+        MMOItems.plugin.getStats().register(new DoubleStat("MG_WEAPON_DAMAGE",Material.BREWING_STAND,"魔法傷害",new String[]{"HeroesSkill 的魔法傷害素質"}));
         MMOItems.plugin.getStats().register(new DoubleStat(SharedStat.MANA_REGENERATION, Material.NETHER_STAR,"回魔", new String[]{"額外回魔"}));
         MMOItems.plugin.getStats().register(new DoubleStat(SharedStat.HEALTH_REGENERATION, Material.NETHER_STAR,"回血",new String[]{"額外回血"}));
     }
