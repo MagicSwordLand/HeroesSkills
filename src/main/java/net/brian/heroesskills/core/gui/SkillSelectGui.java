@@ -52,24 +52,18 @@ public class SkillSelectGui extends PageGui {
         Inventory inv = null;
         while (it.hasNext()){
             Map.Entry<String,SkillData> entry = it.next();
-            if(skillIndex % 45 == 0){
-                inv = Bukkit.createInventory(null,54);
-                skillIndex = 0;
-                pages.add(inv);
-            }
-
             Optional<ActiveSkill> skill= skillManager.getActiveSkill(entry.getKey());
-            if(skill.isEmpty()){
-               // humanEntity.sendMessage("Can't find "+entry.getKey() +" active skill");
+            if(entry.getValue().isEmpty() || skill.isEmpty()){
+                continue;
             }
-            if(entry.getValue().isEmpty()){
-               // humanEntity.sendMessage("你的"+entry.getKey()+"等級是0");
+            ItemStack itemStack = skill.get().getDisplay(skillProfile,entry.getValue());
+            if(skillIndex % 45 == 0){
+                inv = Bukkit.createInventory(null,54,Language.BUTTON_GUI_TITLE);
+                pages.add(inv);
+                skillIndex = 0;
             }
-            if(skill.isPresent() && !entry.getValue().isEmpty()) {
-                //humanEntity.sendMessage("成功放置icon");
-                inv.setItem(skillIndex, skill.get().getDisplay(skillProfile, entry.getValue()));
-                skillIndex++;
-            }
+            inv.setItem(skillIndex,itemStack);
+            skillIndex++;
         }
         if(inv == null){
             humanEntity.sendMessage("你當前沒有任何主動技能");
@@ -116,10 +110,10 @@ public class SkillSelectGui extends PageGui {
     public SkillSelectGui(HeroesSkills plugin, SkillManager skillManager)  {
         Bukkit.getPluginManager().registerEvents(this,plugin);
         this.skillManager = skillManager;
-        elements.put(10,get(ClickSequence.RRL,RRL));
-        elements.put(12,get(ClickSequence.RRR,RRR));
-        elements.put(14,get(ClickSequence.RLL,RLL));
-        elements.put(16,get(ClickSequence.RLR,RLR));
+        elements.put(10,get(ClickSequence.RRR,RRR));
+        elements.put(12,get(ClickSequence.RRL,RRL));
+        elements.put(14,get(ClickSequence.RLR,RLR));
+        elements.put(16,get(ClickSequence.RLL,RLL));
     }
 
     private GuiElement get(ClickSequence clickSequence,ItemStack itemStack){

@@ -1,17 +1,11 @@
 package net.brian.heroesskills.core.skills;
 
-import io.lumine.mythic.core.skills.targeters.SelectorType;
-import io.lumine.mythic.lib.api.stat.StatInstance;
 import io.lumine.mythic.lib.api.stat.StatMap;
 import io.lumine.mythic.lib.api.stat.modifier.StatModifier;
 import net.Indyuce.mmoitems.api.player.PlayerData;
-import net.Indyuce.mmoitems.stat.data.type.StatData;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
 import net.brian.heroesskills.api.players.SkillData;
-import net.brian.heroesskills.api.skills.AbstractSkill;
 import net.brian.heroesskills.core.utils.Icon;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -20,30 +14,17 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-public class PassiveMultipleStatSkill extends AbstractSkill {
+public class MythicActivePassiveStat extends MythicActiveSkill{
 
-    private final BiFunction<PlayerSkillProfile, SkillData, Icon> icon;
-    private final BiFunction<PlayerSkillProfile,SkillData, Map<String,Double>> amountFunction;
 
     private final HashMap<UUID, Set<String>> players = new HashMap<>();
+    BiFunction<PlayerSkillProfile, SkillData, Map<String,Double>> amountFunction;
 
-    public PassiveMultipleStatSkill(
-            String skillID,
-            String display,
-            int maxLevel,
-            BiFunction<PlayerSkillProfile,SkillData,Map<String,Double>>  amountFunction,
-            BiFunction<PlayerSkillProfile,SkillData,Icon> icon) {
-        super(skillID,display);
-        this.maxLevel = maxLevel;
+    public MythicActivePassiveStat(String mythicSkill, String display, int maxLevel, double manaConsume, double cooldown, BiFunction<PlayerSkillProfile, SkillData, Icon> icon,
+                                   BiFunction<PlayerSkillProfile,SkillData, Map<String,Double>>  amountFunction) {
+        super(mythicSkill, display, maxLevel, manaConsume, cooldown, icon);
         this.amountFunction = amountFunction;
-        this.icon = icon;
     }
-
-    @Override
-    protected Icon getIcon(PlayerSkillProfile profile, SkillData skillData) {
-        return icon.apply(profile,skillData);
-    }
-
 
     @Override
     public void onActivate(@NotNull PlayerSkillProfile playerProfile, SkillData skillData){

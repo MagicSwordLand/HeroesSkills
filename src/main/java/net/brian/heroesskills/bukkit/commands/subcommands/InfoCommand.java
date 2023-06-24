@@ -2,14 +2,10 @@ package net.brian.heroesskills.bukkit.commands.subcommands;
 
 import net.brian.heroesskills.HeroesSkills;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
-import net.brian.heroesskills.api.players.SkillData;
 import net.brian.heroesskills.bukkit.commands.SubCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import javax.swing.plaf.basic.BasicButtonUI;
-import java.util.Map;
 
 public class InfoCommand extends SubCommand {
 
@@ -27,7 +23,7 @@ public class InfoCommand extends SubCommand {
         if(player != null){
             PlayerSkillProfile.get(player.getUniqueId()).ifPresent(profile->{
                 profile.getSkills().forEach(entry->{
-                    plugin.getSkillManager().get(entry.getKey()).ifPresent(skill->{
+                    plugin.getSkillManager().getSkill(entry.getKey()).ifPresent(skill->{
                         sender.sendMessage(skill.getDisplayName()+" :"+ entry.getValue().level);
                     });
                 });

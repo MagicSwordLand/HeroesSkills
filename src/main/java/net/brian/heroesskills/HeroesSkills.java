@@ -5,17 +5,23 @@ import lombok.Getter;
 import net.Indyuce.mmoitems.MMOItems;
 import net.Indyuce.mmoitems.stat.type.DoubleStat;
 import net.brian.heroesskills.api.players.PlayerSkillProfile;
+import net.brian.heroesskills.api.players.allyenemy.AllyEnemyDistinguishService;
 import net.brian.heroesskills.api.players.mana.ManaProvider;
 import net.brian.heroesskills.api.skills.SkillManager;
 import net.brian.heroesskills.bukkit.commands.CommandManager;
 import net.brian.heroesskills.bukkit.configs.Language;
 import net.brian.heroesskills.bukkit.listeners.CastingListener;
+import net.brian.heroesskills.core.compabilities.CompatibilityComponent;
+import net.brian.heroesskills.core.compabilities.CompatibilityManager;
 import net.brian.heroesskills.core.compabilities.mmo.MMOManaProvider;
 import net.brian.heroesskills.core.compabilities.placeholder.PlaceholderManager;
 import net.brian.heroesskills.core.gui.SkillSelectGui;
 import net.brian.heroesskills.core.gui.paths.MainPathGui;
+import net.brian.heroesskills.core.player.allyenemy.DistinguishServiceImpl;
 import net.brian.heroesskills.core.skills.SkillManagerImpl;
 import net.brian.playerdatasync.PlayerDataSync;
+import net.brian.playerdatasync.table.TableInfo;
+import net.brian.playerdatasync.table.TableRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,6 +45,9 @@ public final class HeroesSkills extends JavaPlugin {
     @Getter
     private MainPathGui mainPathGui;
 
+    @Getter
+    private AllyEnemyDistinguishService allyEnemyDistinguishService;
+
 
     @Override
     public void onLoad(){
@@ -52,7 +61,12 @@ public final class HeroesSkills extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         new Language(this);
-        PlayerDataSync.getInstance().register("heroesskills", PlayerSkillProfile.class);
+        TableRegistry.register(new TableInfo<>(
+                "heroesskills",
+                (player) -> new PlayerSkillProfile(player.getUniqueId()),
+                PlayerSkillProfile.class
+        ));
+
         manaProvider = new MMOManaProvider(this);
         skillManager = new SkillManagerImpl(this);
         skillSelectGui = new SkillSelectGui(instance,skillManager);
@@ -60,7 +74,8 @@ public final class HeroesSkills extends JavaPlugin {
         registerListeners();
         mainPathGui = new MainPathGui(this);
         new PlaceholderManager(this);
-
+        allyEnemyDistinguishService = new DistinguishServiceImpl(this);
+        new CompatibilityManager(this);
     }
 
     @Override

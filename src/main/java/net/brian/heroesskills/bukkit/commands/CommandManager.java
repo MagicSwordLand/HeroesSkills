@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +24,16 @@ public class CommandManager implements CommandExecutor {
         register(new CastButtonCommand(plugin));
         register(new SkillPointCommand(plugin));
         register(new InfoCommand(plugin));
+        register(new BuffNotAllyCommand(plugin));
+        register(new CoolDownReduceCommand(plugin));
+        register(new DamageNotEnemyCommand(plugin));
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if(!sender.hasPermission("hs.player")){
+            return true;
+        }
         if(args.length == 0) {
             if(sender instanceof Player player){
                 plugin.getMainPathGui().open(player);

@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -39,36 +41,28 @@ public class CastingListener implements Listener {
 
 
     @EventHandler
-    public void onClick(PlayerInteractEvent event){
+    public void onClickAirOrBlock(PlayerInteractEvent event){
         if(event.getHand() == null) return;
         if(!event.getHand().equals(EquipmentSlot.HAND)) return;
         if(!validCastingItem(event.getPlayer().getEquipment().getItemInMainHand())) return;
 
         CastingProfile castingProfile = castingMap.computeIfAbsent(event.getPlayer().getUniqueId(),k->new CastingProfile(event.getPlayer()));
-        if( event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+        if(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             castingProfile.updateClick(ClickType.RIGHT);
-
+            return;
         }
         else if(!castingProfile.sequence.isEmpty() && (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK))) {
             castingProfile.updateClick(ClickType.LEFT);
-        }
-        else return;
-        if(castingProfile.sequence.size() <3) {
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.UI_BUTTON_CLICK,1,2);
             return;
         }
-        event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER,1,2);
+    }
 
-        Optional<PlayerSkillProfile> playerProfile = PlayerSkillProfile.get(event.getPlayer().getUniqueId());
-        Optional<ClickSequence> clickSequence = ClickSequence.get(castingProfile.sequence);
-        castingProfile.sequence.clear();
-        if(playerProfile.isPresent() && clickSequence.isPresent()){
-            playerProfile.get().getButtonSkill(clickSequence.get()).ifPresentOrElse(skill->{
-                skill.cast(event.getPlayer(),playerProfile.get());
-            },()->{
-                event.getPlayer().sendMessage("該欄位未綁定技能 /hs castbutton 來進行綁定");
-            });
-        }
+    @EventHandler
+    public void onClickEntity(PlayerInteractEntityEvent event){
+        if(!event.getHand().equals(EquipmentSlot.HAND)) return;
+        if(!validCastingItem(event.getPlayer().getEquipment().getItemInMainHand())) return;
+        CastingProfile castingProfile = castingMap.computeIfAbsent(event.getPlayer().getUniqueId(),k->new CastingProfile(event.getPlayer()));
+        castingProfile.updateClick(ClickType.RIGHT);
     }
 
     @EventHandler
@@ -96,6 +90,21 @@ public class CastingListener implements Listener {
                 display += type.getDisplay();
             }
             player.sendTitle("   ",display);
+            if(sequence.size() <3) player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK,1,2);
+            else {
+                player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER,1,2);
+
+                Optional<PlayerSkillProfile> playerProfile = PlayerSkillProfile.get(player.getUniqueId());
+                Optional<ClickSequence> clickSequence = ClickSequence.get(sequence);
+                sequence.clear();
+                if(playerProfile.isPresent() && clickSequence.isPresent()){
+                    playerProfile.get().getButtonSkill(clickSequence.get()).ifPresentOrElse(skill->{
+                        skill.cast(playerProfile.get(),playerProfile.get().getSkillData(skill.getSkillID()));
+                    },()->{
+                        player.sendMessage("該欄位未綁定技能 /hs castbutton 來進行綁定");
+                    });
+                }
+            }
         }
 
         BukkitTask startRefreshTask(){

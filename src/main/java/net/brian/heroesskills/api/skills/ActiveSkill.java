@@ -28,28 +28,29 @@ public abstract class ActiveSkill extends AbstractSkill {
 
 
 
-
     public ActiveSkill(String skillID,String displayName) {
         super(skillID,displayName);
     }
 
 
-    public abstract void onCast(@NotNull Player player, @NotNull PlayerSkillProfile playerProfile);
+    public abstract void onCast(@NotNull PlayerSkillProfile playerProfile,SkillData skillData);
 
-    public void cast(Player player, @NotNull PlayerSkillProfile playerProfile){
-        ManaEntity manaEntity = HeroesSkills.getInstance().getManaProvider().getManaEntity(player.getUniqueId());
-        SkillData skillData = playerProfile.getSkillData(skillID);
+    public void onEquip(@NotNull PlayerSkillProfile skillProfile,SkillData skillData){}
+    public void onUnEquip(@NotNull PlayerSkillProfile skillProfile,SkillData skillData){}
+
+    public void cast(@NotNull PlayerSkillProfile playerProfile,SkillData skillData){
+        ManaEntity manaEntity = HeroesSkills.getInstance().getManaProvider().getManaEntity(playerProfile.getUuid());
         long a = ((long) cooldown)*1000 - (System.currentTimeMillis() - skillData.lastCast);
         if(a > 0) {
-            player.sendMessage(Language.CAST_IN_COOLDOWN.replace("#cooldown#",TimeUnit.getDisplayTime(a)));
+            playerProfile.getPlayer().sendMessage(Language.CAST_IN_COOLDOWN.replace("#cooldown#",TimeUnit.getDisplayTime(a)));
         }
         else if(!manaEntity.consume(manaConsume)){
-            player.sendMessage(Language.CAST_NO_MANA.replace("#require#",manaConsume+""));
+            playerProfile.getPlayer().sendMessage(Language.CAST_NO_MANA.replace("#require#",manaConsume+""));
         }
         else {
-            onCast(player, playerProfile);
+            onCast(playerProfile, skillData);
             skillData.lastCast = System.currentTimeMillis();
-            player.sendMessage(Language.CAST_SUCCESS.replace("#name#",displayName));
+            playerProfile.getPlayer().sendMessage(Language.CAST_SUCCESS.replace("#name#",displayName));
         }
     }
 }

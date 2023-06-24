@@ -13,9 +13,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public class PassiveStatSkill extends AbstractSkill {
+
+    public static final String KEY = "HeroesSkill-";
 
     private final BiFunction<PlayerSkillProfile,SkillData,Icon> icon;
     private final BiFunction<PlayerSkillProfile,SkillData,Double> amountFunction;
@@ -49,5 +52,9 @@ public class PassiveStatSkill extends AbstractSkill {
         statInstance.addModifier(statModifier);
     }
 
+    public void onDeactivate (@NotNull PlayerSkillProfile playerProfile,SkillData skillData){
+        if(!playerProfile.getPlayer().isOnline()) return;
+        PlayerData.get(playerProfile.getUuid()).getStats().getMap().getInstance(stat).remove(KEY+skillID);
+    }
 
 }

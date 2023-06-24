@@ -39,7 +39,7 @@ public class MMOManaEntity extends RPGPlayer implements ManaEntity {
 
     @Override
     public void add(double amount) {
-        mana = Math.min(mana+amount,getMaxMana());
+        mana = Math.max(0,Math.min(mana+amount,getMaxMana()));
     }
 
     @Override

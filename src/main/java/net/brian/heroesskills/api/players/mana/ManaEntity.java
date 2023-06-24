@@ -10,6 +10,7 @@ public interface ManaEntity {
     boolean consume(double amount);
 
     void add(double amount);
+    void setMana(double amount);
 
     // regens per 2 seconds
     double getManaRegen();

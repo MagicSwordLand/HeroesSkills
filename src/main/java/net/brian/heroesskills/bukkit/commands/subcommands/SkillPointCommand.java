@@ -33,6 +33,7 @@ public class SkillPointCommand extends SubCommand {
         }
         if(args[1].equalsIgnoreCase("reset")) {
             skillProfile.get().resetSkillPoints();
+            player.sendMessage("天賦點已重製");
         }
         if(args[1].equalsIgnoreCase("add")){
             int amount = 1;

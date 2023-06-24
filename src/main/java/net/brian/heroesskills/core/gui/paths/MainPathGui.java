@@ -6,11 +6,13 @@ import net.brian.heroesskills.api.players.PlayerSkillProfile;
 import net.brian.heroesskills.bukkit.configs.Language;
 import net.brian.heroesskills.core.utils.Icon;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,9 @@ public class MainPathGui extends SimpleGui {
         Optional<PlayerSkillProfile> skillProfile = PlayerSkillProfile.get(humanEntity.getUniqueId());
         if(skillProfile.isEmpty()) return inv;
         paths.values().forEach(subPath -> {
+            ItemStack icon = subPath.icon.apply(skillProfile.get()).build((Player) humanEntity);
+            if(!humanEntity.hasPermission("hs.path."+subPath.getID()))
+                icon.setType(Material.BARRIER);
             inv.setItem(subPath.slot, subPath.icon.apply(skillProfile.get()).build((Player) humanEntity));
         });
         return inv;
@@ -44,15 +49,21 @@ public class MainPathGui extends SimpleGui {
         if(event.getCurrentItem() == null) return;
         for (Map.Entry<String, SubPath> entry : paths.entrySet()) {
             if(entry.getValue().slot == event.getSlot()){
-                entry.getValue().open(event.getWhoClicked());
-                return;
+                if(event.getWhoClicked().hasPermission("hs.path."+entry.getKey())){
+                    Bukkit.getScheduler().runTaskLater(
+                            HeroesSkills.getInstance(),
+                            ()->entry.getValue().open(event.getWhoClicked()),
+                            1L
+                    );
+                }
+                else event.getWhoClicked().sendMessage(Language.PATH_NOT_UNLOCKED);
             }
         }
     }
 
 
     public void registerPath(String ID, int slot,String guiTitle, Function<PlayerSkillProfile,Icon> display,Map<Integer,Function<PlayerSkillProfile, Icon>> staticElements){
-        SubPath subPath = new SubPath(plugin,this,slot,guiTitle,display);
+        SubPath subPath = new SubPath(plugin,ID,this,slot,guiTitle,display);
         paths.put(ID,subPath);
         staticElements.forEach(subPath::addStaticElement);
     }

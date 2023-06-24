@@ -18,7 +18,7 @@ public class SkillLevelCondition implements Function<PlayerSkillProfile,Boolean>
     public Boolean apply(PlayerSkillProfile skillProfile) {
         boolean valid = skillProfile.getSkillData(skill).level >= level;
         if(valid) return true;
-        HeroesSkills.getInstance().getSkillManager().get(skill).ifPresent(skill->{
+        HeroesSkills.getInstance().getSkillManager().getSkill(skill).ifPresent(skill->{
             skillProfile.getPlayer().sendMessage("你的"+skill.getDisplayName()+"等級必須到達"+level+"才能升級此天賦");
         });
         return false;

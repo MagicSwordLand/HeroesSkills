@@ -31,8 +31,8 @@ public class MythicActiveSkill extends ActiveSkill {
 
 
     @Override
-    public void onCast(@NotNull Player player, @NotNull PlayerSkillProfile playerProfile) {
-        MythicBukkit.inst().getAPIHelper().castSkill(player,getSkillID());
+    public void onCast( @NotNull PlayerSkillProfile playerProfile,SkillData skillData) {
+        MythicBukkit.inst().getAPIHelper().castSkill(playerProfile.getPlayer(),getSkillID());
     }
 
     @Override

@@ -82,7 +82,7 @@ public class Icon {
     }
 
     public Icon addLore(List<String> lore){
-        this.lore.addAll(lore);
+        this.lore.addAll(IridiumColorAPI.process(lore));
         return this;
     }
 

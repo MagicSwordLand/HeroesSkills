@@ -13,7 +13,7 @@ public class SkillManagerImpl implements SkillManager {
 
     private final HeroesSkills plugin;
 
-    private final HashMap<String,AbstractSkill> cache = new HashMap<>();
+    private final HashMap<String,AbstractSkill> skillCache = new HashMap<>();
     private final HashMap<String, ActiveSkill > activeSkillCache = new HashMap<>();
 
     public SkillManagerImpl(HeroesSkills plugin){
@@ -23,14 +23,18 @@ public class SkillManagerImpl implements SkillManager {
     @Override
     public void register(AbstractSkill abstractSkill) {
         if(abstractSkill != null)
-            cache.put(abstractSkill.getSkillID(),abstractSkill);
+            skillCache.compute(abstractSkill.getSkillID(), (k,v)->{
+                if(v != null) v.onDispose();
+                abstractSkill.onRegister();
+                return abstractSkill;
+            });
         if(abstractSkill instanceof ActiveSkill activeSkill)
             activeSkillCache.put(activeSkill.getSkillID(),activeSkill);
     }
 
     @Override
-    public Optional<AbstractSkill> get(String id) {
-        return Optional.ofNullable(cache.get(id));
+    public Optional<AbstractSkill> getSkill(String id) {
+        return Optional.ofNullable(skillCache.get(id));
     }
 
     @Override
@@ -45,11 +49,13 @@ public class SkillManagerImpl implements SkillManager {
 
     @Override
     public Collection<AbstractSkill> getSkills() {
-        return cache.values();
+        return skillCache.values();
     }
 
     @Override
-    public void clear() {
-        cache.clear();
+    public void clearSkills() {
+        skillCache.clear();
     }
+
+
 }

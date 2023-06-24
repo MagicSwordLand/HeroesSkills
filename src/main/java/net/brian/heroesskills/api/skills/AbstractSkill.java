@@ -46,4 +46,6 @@ public abstract class AbstractSkill {
     public void onDeactivate( @NotNull PlayerSkillProfile playerProfile, SkillData skillData){}
 
 
+    public void onDispose(){};
+    public void onRegister(){};
 }

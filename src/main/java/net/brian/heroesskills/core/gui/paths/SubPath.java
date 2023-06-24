@@ -39,10 +39,16 @@ public class SubPath extends SimpleGui {
 
     private String guiTitle;
 
-    public SubPath(HeroesSkills plugin, MainPathGui mainPathGui, int slot,String guiTitle, Function<PlayerSkillProfile,Icon> icon) {
+    @Getter
+    private final String ID;
+
+    public SubPath(HeroesSkills plugin,String ID, MainPathGui mainPathGui, int slot,String guiTitle, Function<PlayerSkillProfile,Icon> icon) {
         super(plugin);
+        this.ID = ID;
         this.mainPathGui = mainPathGui;
-        onClose = mainPathGui::open;
+        onClose = p->Bukkit.getScheduler().runTask(HeroesSkills.getInstance(),()->{
+            mainPathGui.open(p);
+        });
         this.icon = icon;
         this.guiTitle = guiTitle;
         this.slot = slot;
@@ -54,17 +60,7 @@ public class SubPath extends SimpleGui {
         Optional<PlayerSkillProfile> profile = PlayerSkillProfile.get(humanEntity.getUniqueId());
         if(profile.isEmpty()) return inv;
         PlayerSkillProfile skillProfile = profile.get();
-        skillAllocation.forEach((slot,pathElement)->{
-            SkillData skillData = skillProfile.getSkillData(pathElement.getAbstractSkill().getSkillID());
-            if(skillData.isEmpty()) {
-                ItemStack icon = pathElement.getAbstractSkill().getDisplay(skillProfile,SkillData.EMPTY_DATA);
-                icon.setType(Material.BARRIER);
-                inv.setItem(slot,icon);
-            }
-            else {
-                inv.setItem(slot,pathElement.getAbstractSkill().getDisplay(skillProfile,skillData));
-            }
-        });
+        refresh(skillProfile,inv);
         return inv;
     }
 
@@ -79,7 +75,7 @@ public class SubPath extends SimpleGui {
         PlayerSkillProfile.get(event.getWhoClicked().getUniqueId()).ifPresent(profile->{
             if(pathElement.valid(profile)){
                 profile.assignSkillPoint(1,pathElement.getAbstractSkill());
-                refresh(profile,event.getSlot());
+                refresh(profile, event.getClickedInventory());
             }
         });
     }
@@ -93,15 +89,19 @@ public class SubPath extends SimpleGui {
         return false;
     }
 
-    private void refresh(PlayerSkillProfile profile,int slot){
-        Inventory inv = viewers.get(profile.getPlayer());
-        if(inv == null) return;
-        PathElement pathElement = skillAllocation.get(slot);
-        if(pathElement == null) return;
-        SkillData skillData = profile.getSkillData(pathElement.getAbstractSkill().getSkillID());
-        if(!skillData.isEmpty()){
-            inv.setItem(slot,pathElement.getAbstractSkill().getDisplay(profile,skillData));
-        }
+
+    private void refresh(PlayerSkillProfile skillProfile,Inventory inv){
+        skillAllocation.forEach((slot,pathElement)->{
+            SkillData skillData = skillProfile.getSkillData(pathElement.getAbstractSkill().getSkillID());
+            if(!pathElement.valid(skillProfile)) {
+                ItemStack icon = pathElement.getAbstractSkill().getDisplay(skillProfile,SkillData.EMPTY_DATA);
+                icon.setType(Material.BARRIER);
+                inv.setItem(slot,icon);
+            }
+            else {
+                inv.setItem(slot,pathElement.getAbstractSkill().getDisplay(skillProfile,skillData));
+            }
+        });
     }
 
     public int getUnlockedAmount(PlayerSkillProfile profile){

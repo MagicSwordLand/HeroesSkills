@@ -27,7 +27,7 @@ public class AddSkillCommand extends SubCommand {
             sender.sendMessage("找不到該玩家"+args[1]);
             return;
         }
-        Optional<AbstractSkill> abstractSkill = plugin.getSkillManager().get(args[2]);
+        Optional<AbstractSkill> abstractSkill = plugin.getSkillManager().getSkill(args[2]);
         if(abstractSkill.isEmpty()) {
             sender.sendMessage("找不到技能"+args[2]);
             return;
