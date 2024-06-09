@@ -9,6 +9,7 @@ skills.
 - Detects click sequence(RRR, RLR, RLL, RRL) on certain items to cast skills.
 - Allows players to bind skills to certain click sequence
 
+## QuickStart
 ```kt
 var passiveSkill = PassiveStatSkill(
     "技能id",
